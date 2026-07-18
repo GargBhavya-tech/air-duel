@@ -5,75 +5,96 @@ const MOVE_LABEL = {
   dodge_left: 'DODGE ←', dodge_right: 'DODGE →',
 };
 
-export default function HUD({ match, aiName, flash }) {
+const MOVE_ICON = {
+  punch: '👊', kick: '🦵', block: '🛡', dodge_left: '←', dodge_right: '→',
+};
+
+export default function HUD({ match, aiName, flash, lastPlayerMove, lastAiMove }) {
   if (!match) return null;
   const { hp, timeLeft, round, log } = match;
 
+  const playerLow = hp.player <= 25;
+  const aiLow = hp.ai <= 25;
+  const timeUrgent = timeLeft <= 10;
+
   return (
     <>
+      {/* ── Top HUD ── */}
       <div className="hud-top">
+        {/* Player */}
         <div className="fighter-block">
           <div className="fighter-label">Fighter 01</div>
           <div className="fighter-name display player">YOU</div>
           <div className="healthbar-track">
             <motion.div
-              className="healthbar-fill player"
+              className={`healthbar-fill player${playerLow ? ' low' : ''}`}
               animate={{ width: `${hp.player}%` }}
               transition={{ type: 'spring', stiffness: 200, damping: 26 }}
             />
           </div>
-          <div className="hp-value mono">{hp.player} / 100</div>
+          <div className="hp-value">{hp.player} <span style={{ opacity: 0.4 }}>/ 100 HP</span></div>
+          <div className={`move-badge${lastPlayerMove ? ' visible' : ''}`}>
+            {lastPlayerMove && <span>{lastPlayerMove}</span>}
+          </div>
         </div>
 
+        {/* Center: Timer */}
         <div className="center-hud">
-          <div className="display" id="timer">{timeLeft}</div>
+          <div className={`display${timeUrgent ? ' urgent' : ''}`} id="timer">{timeLeft}</div>
           <div id="roundLabel">Round {round}</div>
         </div>
 
+        {/* AI */}
         <div className="fighter-block right">
           <div className="fighter-label">Fighter 02</div>
-          <div className="fighter-name display ai">{aiName}</div>
+          <div className="fighter-name display ai">{aiName || 'A.I.'}</div>
           <div className="healthbar-track">
             <motion.div
-              className="healthbar-fill ai"
+              className={`healthbar-fill ai${aiLow ? ' low' : ''}`}
               animate={{ width: `${hp.ai}%` }}
               transition={{ type: 'spring', stiffness: 200, damping: 26 }}
+              style={{ marginLeft: 'auto' }}
             />
           </div>
-          <div className="hp-value mono">{hp.ai} / 100</div>
+          <div className="hp-value" style={{ textAlign: 'right' }}>{hp.ai} <span style={{ opacity: 0.4 }}>/ 100 HP</span></div>
+          <div className={`move-badge ai-badge${lastAiMove ? ' visible' : ''}`} style={{ float: 'right' }}>
+            {lastAiMove && <span>{lastAiMove}</span>}
+          </div>
         </div>
       </div>
 
+      {/* ── Flash / Hit callout ── */}
       <AnimatePresence>
         {flash && (
           <motion.div
             key={flash.id}
             className={`flash display ${flash.hit ? 'hit' : ''}`}
-            initial={{ opacity: 0, scale: 0.85, y: 0 }}
-            animate={{ opacity: 1, scale: 1, y: -6 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.18 }}
+            initial={{ opacity: 0, scale: 0.7, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 1.1, y: -10 }}
+            transition={{ duration: 0.15 }}
           >
             {flash.text}
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* ── Move Log ── */}
       <div className="movelog">
         <AnimatePresence initial={false}>
-          {log.slice(-5).map((entry) => (
+          {log.slice(-4).map((entry) => (
             <motion.div
               key={entry.t + entry.who}
               className="log-line mono"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 0.7, x: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
             >
               <span className={`tag ${entry.who === 'ai' ? 'ai-tag' : ''}`}>
-                {entry.who === 'ai' ? 'AI' : 'YOU'}
+                {entry.who === 'ai' ? (aiName || 'AI') : 'YOU'}
               </span>
-              {' — '}
+              <span style={{ opacity: 0.4 }}>→</span>
               {MOVE_LABEL[entry.move] || entry.move.toUpperCase()}
             </motion.div>
           ))}
