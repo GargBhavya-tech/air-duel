@@ -5,6 +5,7 @@ const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:4000';
 export function useMatchSocket() {
   const [match, setMatch] = useState(null);
   const [aiName, setAiName] = useState('AI');
+  const [aiEmbedding, setAiEmbedding] = useState(null);
   const [endInfo, setEndInfo] = useState(null);
   const [connected, setConnected] = useState(false);
   const wsRef = useRef(null);
@@ -21,6 +22,7 @@ export function useMatchSocket() {
       if (msg.type === 'state') {
         setMatch(msg.match);
         setAiName(msg.aiName);
+        setAiEmbedding(msg.aiEmbedding || null);
       }
       if (msg.type === 'end') {
         setEndInfo({ reason: msg.reason, match: msg.match });
@@ -43,5 +45,5 @@ export function useMatchSocket() {
     }
   }, []);
 
-  return { match, aiName, endInfo, connected, sendMove, startMatch };
+  return { match, aiName, aiEmbedding, endInfo, connected, sendMove, startMatch };
 }

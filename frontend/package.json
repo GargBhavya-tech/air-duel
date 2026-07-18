@@ -18,7 +18,9 @@
     "@react-spring/three": "^9.7.3",
     "framer-motion": "^11.3.8",
     "@mediapipe/pose": "^0.5.1675469404",
-    "@mediapipe/camera_utils": "^0.3.1675466862"
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@tensorflow/tfjs": "^4.20.0",
+    "kalidokit": "^1.1.5"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",

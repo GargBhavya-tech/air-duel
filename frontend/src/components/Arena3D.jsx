@@ -3,7 +3,7 @@ import { OrbitControls, ContactShadows, Environment } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import Fighter from './Fighter.jsx';
 
-export default function Arena3D({ playerMove, aiMove, hitFlash }) {
+export default function Arena3D({ playerMove, aiMove, hitFlash, liveRigRef }) {
   return (
     <Canvas
       shadows
@@ -21,7 +21,7 @@ export default function Arena3D({ playerMove, aiMove, hitFlash }) {
       <pointLight position={[-3, 2, -2]} intensity={0.4} color="#00E5FF" />
       <pointLight position={[3, 2, -2]} intensity={0.4} color="#8B6BFF" />
 
-      <Fighter position={[-0.9, 0, 0]} color="#00E5FF" currentMove={playerMove} label="YOU" />
+      <Fighter position={[-0.9, 0, 0]} color="#00E5FF" currentMove={playerMove} label="YOU" liveRigRef={liveRigRef} />
       <Fighter position={[0.9, 0, 0]} color="#8B6BFF" currentMove={aiMove} mirrored label="AI" />
 
       <ContactShadows position={[0, 0, 0]} opacity={0.5} scale={6} blur={2} far={2} />

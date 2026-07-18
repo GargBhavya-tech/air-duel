@@ -34,14 +34,19 @@ function freshMatch() {
 }
 
 let match = freshMatch();
-let ai = new NaiveAI(); // swap to `new StyleEmbeddingAI()` when Phase 3 lands
+let ai = new StyleEmbeddingAI(); // Phase 3 — was `new NaiveAI()` through Phase 1.5/2
 let timerInterval = null;
 let aiTimeout = null;
 
 const clients = new Set();
 
 function broadcast() {
-  const payload = JSON.stringify({ type: 'state', match, aiName: ai.name });
+  const payload = JSON.stringify({
+    type: 'state',
+    match,
+    aiName: ai.name,
+    aiEmbedding: ai.getEmbeddingSnapshot ? ai.getEmbeddingSnapshot() : null,
+  });
   for (const ws of clients) {
     if (ws.readyState === ws.OPEN) ws.send(payload);
   }

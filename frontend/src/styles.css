@@ -125,3 +125,11 @@ button:disabled { background: var(--dim); cursor: default; }
   position: absolute; bottom: -2px; left: 0; z-index: 5; padding: 4px 18px;
   font-size: 10px; color: var(--dim); letter-spacing: 0.08em; opacity: 0.7;
 }
+
+.radar-panel {
+  position: absolute; bottom: 44px; right: 14px; z-index: 5;
+  background: rgba(16,20,28,0.85); border: 1px solid var(--line); border-radius: 4px;
+  padding: 8px; pointer-events: none;
+}
+.radar-title { font-size: 10px; color: var(--dim); letter-spacing: 0.1em; margin-bottom: 2px; text-align: center; }
+.radar-note { color: var(--ember); }

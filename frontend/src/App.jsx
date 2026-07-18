@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import Arena3D from './components/Arena3D.jsx';
 import HUD from './components/HUD.jsx';
+import RadarChart from './components/RadarChart.jsx';
 import { StatusPanel, ResultPanel } from './components/Panels.jsx';
 import { usePoseTracker } from './hooks/usePoseTracker.js';
 import { useMatchSocket } from './hooks/useMatchSocket.js';
@@ -13,12 +14,13 @@ const MOVE_LABEL = {
 export default function App() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const liveRigRef = useRef(null); // updated every pose frame, read imperatively by Fighter — avoids a React re-render at 30fps
   const [active, setActive] = useState(false);
   const [flash, setFlash] = useState(null);
   const [playerMoveVisual, setPlayerMoveVisual] = useState('idle');
   const [aiMoveVisual, setAiMoveVisual] = useState('idle');
 
-  const { match, aiName, endInfo, sendMove, startMatch } = useMatchSocket();
+  const { match, aiName, aiEmbedding, endInfo, sendMove, startMatch } = useMatchSocket();
 
   const handleMove = useCallback((move) => {
     sendMove(move);
@@ -27,8 +29,9 @@ export default function App() {
     setTimeout(() => setPlayerMoveVisual('idle'), 500);
   }, [sendMove]);
 
-  const { status, errorMsg, calibProgress } = usePoseTracker({
+  const { status, errorMsg, calibProgress, classifierMode } = usePoseTracker({
     onMove: handleMove,
+    onRig: (rig) => { liveRigRef.current = rig; },
     videoRef,
     canvasRef,
     active,
@@ -65,14 +68,15 @@ export default function App() {
         <canvas ref={canvasRef} className="pose-canvas" />
 
         <div className="arena-layer">
-          <Arena3D playerMove={playerMoveVisual} aiMove={aiMoveVisual} hitFlash={flash?.hit} />
+          <Arena3D playerMove={playerMoveVisual} aiMove={aiMoveVisual} hitFlash={flash?.hit} liveRigRef={liveRigRef} />
         </div>
 
         <div className="scan" />
 
         {match && <HUD match={match} aiName={aiName} flash={flash} />}
+        {match && aiEmbedding && <RadarChart embedding={aiEmbedding} aiName={aiName} />}
 
-        <div className="footer mono">AIR DUEL // TELEMETRY v0.2 // frontend+backend split</div>
+        <div className="footer mono">AIR DUEL // TELEMETRY v0.2 // classifier: {classifierMode}</div>
 
         {(status !== 'ready' || !match?.running) && !endInfo && (
           <StatusPanel

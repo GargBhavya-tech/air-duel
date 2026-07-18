@@ -1,0 +1,11 @@
+{
+  "name": "air-duel-ml",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "train": "node train.js"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^4.20.0"
+  }
+}
